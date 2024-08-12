@@ -67,15 +67,39 @@ throwing.df %>%
 throwing.df %>%
   mutate(distance = as.character(distance)) %>%
   ggplot(aes(x = accuracy_pct, y = distance, fill = side)) +
-  geom_density_ridges(alpha = 0.5) +
+  geom_density_ridges(alpha = 0.5, col = "white", linewidth = 2,
+                      scale = 1.5
+                      ) +
   scale_x_continuous(limits = c(0, 10)/10,
-                     breaks = 1:10/10,
+                     breaks = c(1),
                      labels = scales::percent_format(accuracy = 1)
   ) +
   theme_minimal() +
   labs(title = "Accuracy by distance",
        x = "Accuracy in %",
-       y = "Distance (m)")
+       y = "Distance (m)",
+       fill = "") +
+  scale_fill_manual(values = c("Backhand" = "steelblue", "Forehand" = "orange")) +
+  scale_y_discrete(limits = c("10", "15", "25", "30"),
+                   labels = c("10m", "15m", "25m", "30m"),
+                   expand = c(0, 0)) +
+  theme(
+    aspect.ratio = 1,
+    legend.position = "bottom",
+    plot.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = 20, color = "white"),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 20, color = "white"),
+    panel.background = element_blank(), #transparent panel bg
+    plot.background = element_rect(fill='transparent', color=NA), #transparent plot bg
+    panel.grid.major = element_blank(), #remove major gridlines
+    panel.grid.minor = element_blank(), #remove minor gridlines
+    legend.background = element_blank(), #transparent legend bg
+    legend.box.background = element_blank() #transparent legend panel
+  )
+
+ggsave("figures/accuracy_by_distance.png", width = 10, height = 6)
 
 # make a ridge plot of accuracy by distance
 # split it out by side and gender
@@ -439,8 +463,14 @@ simulated_results.150 <-
             simplify = FALSE) %>%
   bind_rows()
 
+simulated_results.1000 <- 
+  replicate(1000, simulate_line(select_lineup()), 
+            simplify = FALSE) %>%
+  bind_rows()
+
 # save the results
-saveRDS(simulated_results.150, "data/simulated_results_150lines.rds")
+saveRDS(simulated_results.1000, "data/simulated_results_1000lines.rds")
+simulated_results <- readRDS("data/simulated_results_1000lines.rds")
 
 # 100 different lineups are run for 1000 points each
 
@@ -451,7 +481,7 @@ library(gghighlight)
 # calculate the average distance of the throws
 # calculate the amount of times more than 5 successful throws
 derived_results <- 
-  simulated_results.150 %>%
+  simulated_results %>%
   group_by(lineup, ratio) %>%
   summarise(
     sample_size = n(),
@@ -491,7 +521,7 @@ derived_results %>%
 # create a boxplot of the number of successful throws for the
 # top 10 lines
 top_lines <- 
-simulated_results.100 %>%
+  simulated_results %>%
   group_by(lineup, ratio) %>%
   summarise(
     avg_throws = mean(throws)
@@ -510,8 +540,11 @@ simulated_results.100 %>%
     bottom = row_number() > n() - 10
   )
 
+top_lines %>% filter(top)
+top_lines %>% filter(bottom)
+
 # for the top 10 lines and bottom 10 lines
-simulated_results.150 %>%
+simulated_results %>%
   inner_join(top_lines %>%
                filter(top | bottom), by = c("lineup" = "lineup", "ratio" = "ratio")) %>%
   ggplot(aes(x = throws, y = line, fill = top)) +
@@ -522,10 +555,13 @@ simulated_results.150 %>%
   theme_minimal() +
   facet_wrap(~top)
 
+# top 10% of the lines by consecutive throws
+simulated_results$throws %>% quantile(0.9)
+
 # Individual player contributions
 # Assuming `simulated_results.100` is the dataframe with the results
 # Unnest the lineup column
-unnested_results <- simulated_results.150 %>%
+unnested_results <- simulated_results %>%
   unnest(lineup) %>%
   rename(player = lineup)
 
@@ -534,7 +570,7 @@ player_contributions <- unnested_results %>%
   group_by(player, ratio) %>%
   summarise(
     avg_throws = mean(throws, na.rm = TRUE),
-    success = sum(throws > 5, na.rm = TRUE),
+    success = sum(throws > 7, na.rm = TRUE),
     count = n()
   ) %>%
   mutate(
@@ -546,21 +582,45 @@ player_contributions <- unnested_results %>%
 # Identify top and bottom players based on average throws
 # Visualize player contributions
 ggplot(player_contributions, 
-       aes(x = reorder(player, -success_ratio), 
+       aes(x = reorder(player, success_ratio), 
            y = success_ratio)) +
   geom_col() +
   geom_text(aes(label = scales::percent(success_ratio, accuracy = .1)),
             nudge_y = 0.05) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = .1)) +
   coord_flip() +
   theme_minimal() +
-  facet_wrap(~ratio, scales = "free_x") +
+  facet_wrap(~ratio, scales = "free_y") +
   gghighlight::gghighlight(
     success_ratio,
     max_highlight = 10L, 
     calculate_per_facet = TRUE) +
-  labs(title = "Average Contribution of Players",
+  labs(title = "Contribution to succes ratio of Players",
+       subtitle = "% of points played that strings together 7 or more successful throws (top 10%)",
        x = "Player",
-       y = "Average Successful Throws")
+       y = "Succes ratio")
 
+# ....
+
+# Input values
+p <- .9       # sample proportion
+n <- 1       # sample size
+confidence_level <- 0.95
+
+# Calculate the z-value for the desired confidence level
+z <- qnorm((1 + confidence_level) / 2)
+
+# Calculate the standard error
+standard_error <- sqrt(p * (1 - p) / n)
+
+# Calculate the margin of error
+margin_of_error <- z * standard_error
+
+# Calculate the confidence interval
+lower_bound <- p - margin_of_error
+upper_bound <- p + margin_of_error
+
+# Print the confidence interval
+cat("The", confidence_level*100, "% confidence interval is: [", lower_bound, ", ", upper_bound, "]\n")
 
 

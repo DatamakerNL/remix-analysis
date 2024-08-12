@@ -1,0 +1,24 @@
+score_id,game_id,line,offense_defense,gender_ratio,turnovers_total,turnovers_remix,turnovers_opponents,hucks_thrown,turnovers_hucks,turnovers_endzone,blocks_made,remix_zone,opponents_zone,remix_score,opponents_score
+491,35,"Lunch Club",D,F,0,0,0,NULL,NULL,NULL,0,0,0,0,1
+492,35,"Rocky Road",O,M,5,3,2,NULL,NULL,NULL,0,0,0,0,1
+493,35,"Lunch Club",O,M,1,1,0,NULL,NULL,NULL,0,0,0,0,1
+494,35,"Rocky Road",O,F,0,0,0,NULL,NULL,NULL,0,0,0,1,0
+495,35,"Lunch Club",D,F,2,1,1,NULL,NULL,NULL,0,0,1,0,1
+496,35,"Rocky Road",O,M,4,2,2,NULL,NULL,NULL,0,0,1,0,1
+497,35,"Lunch Club",O,M,1,1,1,NULL,NULL,NULL,0,0,1,1,0
+498,35,"Rocky Road",D,F,0,0,0,NULL,NULL,NULL,0,0,0,0,1
+499,35,"Lunch Club",O,F,1,1,0,NULL,NULL,NULL,0,0,0,0,1
+500,35,"Rocky Road",O,M,1,1,0,NULL,NULL,NULL,0,0,0,0,1
+501,35,"Rocky Road",O,M,5,3,2,NULL,NULL,NULL,1,0,0,0,1
+502,35,"Lunch Club",O,F,2,1,1,NULL,NULL,NULL,0,0,0,1,0
+503,35,"Rocky Road",D,F,0,0,0,NULL,NULL,NULL,0,1,0,0,1
+504,35,"Lunch Club",O,M,0,0,0,NULL,NULL,NULL,0,0,0,1,0
+505,35,"Rocky Road",D,M,1,0,1,NULL,NULL,NULL,0,1,0,1,0
+506,35,"Lunch Club",D,F,0,0,0,NULL,NULL,NULL,0,1,0,0,1
+507,35,"Rocky Road",O,F,8,4,4,NULL,NULL,NULL,2,0,1,1,0
+508,35,"Lunch Club",D,M,0,0,0,NULL,NULL,NULL,0,1,0,0,1
+509,35,"Rocky Road",O,M,2,1,1,NULL,NULL,NULL,0,0,0,1,0
+510,35,"Rocky Road",D,F,0,0,0,NULL,NULL,NULL,0,0,0,0,1
+511,35,"Rocky Road",O,F,0,0,0,NULL,NULL,NULL,0,0,0,1,0
+512,35,"Lunch Club",D,M,0,0,0,NULL,NULL,NULL,0,0,0,0,1
+513,35,"Rocky Road",O,M,3,2,1,NULL,NULL,NULL,1,0,1,0,1
